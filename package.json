@@ -4,7 +4,7 @@
   "description": "To demostrate protractor cucumber tests for angular/non angular apps with serenity report framework",
   "types": "./**/*.d.ts",
   "scripts": {
-    "build":"tsc",
+    "build": "tsc",
     "setup": "webdriver-manager --ignore_ssl update --standalone=false",
     "lint": "eslint . --ext ts",
     "lint:fix": "eslint . --ext ts --fix",

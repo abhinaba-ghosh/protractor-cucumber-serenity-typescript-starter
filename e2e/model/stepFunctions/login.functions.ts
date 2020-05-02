@@ -1,4 +1,4 @@
-import { expect, p } from 'core';
+import { p } from 'core';
 import { loginPage } from 'e2e/model/pageObjects';
 import { browser } from 'protractor';
 
@@ -17,10 +17,6 @@ class LoginFunctions {
 
   async clickLoginBtn() {
     await p.click(loginPage.loginBtn);
-  }
-
-  async checkLoginSuccess() {
-    await expect(loginPage.loginSuccessMsg).to.be.present;
   }
 }
 
