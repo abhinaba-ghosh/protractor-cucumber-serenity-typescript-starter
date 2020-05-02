@@ -1,7 +1,7 @@
 {
   "name": "serenity-protractor-cucumber",
   "version": "2.0.0",
-  "description": "Protractor BDD UI tests",
+  "description": "To demostrate protractor cucumber tests for angular/non angular apps with serenity report framework",
   "types": "./**/*.d.ts",
   "scripts": {
     "build":"tsc",
@@ -18,9 +18,23 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/abhinaba-ghosh/protractor-cucumber-serenity-typescript-starter.git"
   },
-  "private": true,
+  "author": "Abhinaba Ghosh <askabhinaba@gmail.com>",
+  "keywords": [
+    "protractor",
+    "cucumber",
+    "typescript",
+    "angular",
+    "angularjs",
+    "testing",
+    "behaviour driven development",
+    "bdd",
+    "serenity",
+    "webdriverJS",
+    "gherkin",
+    "automation testing"
+  ],
   "dependencies": {
     "@serenity-js/assertions": "2.2.2",
     "@serenity-js/console-reporter": "2.2.2",
