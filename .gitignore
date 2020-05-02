@@ -4,6 +4,7 @@ target/
 transform
 *.log
 drivers
+package-lock.json
 
 # Build artifacts
 .nyc_output
