@@ -42,10 +42,10 @@ This starter pack is a killer combination of different javascript modules to ena
 - [Framework ADD-ons](#framework-add-ons)
   - [Auto Retry Mechanism](#auto-retry-mechanism)
   - [Automated Accessibility Testing](#automated-accessibility-testing)
-  - [Automated Database Testing [Microsoft SQL Server]](#automated-database-testing--microsoft-sql-server-)
+  - [Automated Database Testing [Microsoft SQL Server]](#automated-database-testing--microsoft-sql-server)
 - [Contributions](#contributions)
 
-## <p style='color:red'>:pushpin: Get Started</p>
+## Get Started
 
 #### Pre-requisites
 
@@ -77,7 +77,7 @@ Please Install all the VS code plugins recommended in Project settings (.vscode 
   ![extensionscreen](./artifacts/images/extension-recom.PNG)
 </details>
 
-## <p style='color:red'>:pushpin: Setup Scripts</p>
+## Setup Scripts
 
 - Clone the repository into a folder
 - Go inside the folder and make sure _**.npmrc**_ values are set correctly. sometimes organizations use their own registry. In that case, provide the registry details correctly.
@@ -167,7 +167,7 @@ npm run report:jenkins
 
 Reports will be available in target > site > serenity > index.html
 
-## <p style='color:red'>:pushpin: Multi-Browser Testing</p>
+## Multi-Browser Testing
 
 You can execute tests in your favorite browser just passing some extra flags from CLI.
 By default , all tests executes on **_Chrome_** browser
@@ -190,7 +190,7 @@ npm run e2e -- --browser=firefox --headless
 
 ```
 
-## <p style='color:red'>:pushpin: Lint Automation Code</p>
+## Lint Automation Code
 
 ```
 //lint your code
@@ -200,7 +200,7 @@ npm run lint
 npm run lint:fix
 ```
 
-## <p style='color:red'>:pushpin: Debug Code</p>
+## Debug Code
 
 Debugging is pretty easy with this framework. Debug configurations are configured in .vscode > launch.json file. To debug your code, you need to follow below steps in VS Code:
 
@@ -212,7 +212,7 @@ Debugging is pretty easy with this framework. Debug configurations are configure
 
 As soon as you press the debug button, pre-debugging tasks (clean + build) will start. After the pre-launch task is completed, navigate to debug console to view the run time debug status.
 
-## <p style='color:red'>:pushpin: Quick guide to writing tests</p>
+## Quick guide to writing tests
 
 #### Writing Features
 
@@ -300,7 +300,7 @@ If **target** folder is configured as your base reporting directory in **.env** 
 
 > Serenity reports --> target/site/serenity/index.html
 
-## <p style='color:red'>:pushpin: Serenity Dashboard</p>
+## Serenity Dashboard
 
 Currently this project has been integrated with Serenity-JS. Reports produced are user-friendly and BDD structured.
 
@@ -310,7 +310,7 @@ Each Test contains Screenplay pattern insight reports
 
 ![extensionscreen](./artifacts/images/serenity-details.png)
 
-## <p style='color:red'>:pushpin: Framework ADD-ons </p>
+## Framework ADD-ons 
 
 #### Auto Retry Mechanism
 
