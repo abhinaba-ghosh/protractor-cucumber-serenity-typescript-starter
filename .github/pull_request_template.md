@@ -24,10 +24,6 @@
 - [ ] Yes
 - [ ] No
 
-## Jira Ticket
-
-https://bedfordjira.na.rsa.net/browse/XXXX
-
 #### Issue / Feature
 
 [Description]
