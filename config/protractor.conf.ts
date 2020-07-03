@@ -31,8 +31,6 @@ const config: Config = {
   framework: 'custom',
   frameworkPath: require.resolve('@serenity-js/protractor/adapter'),
 
-  SELENIUM_PROMISE_MANAGER: false,
-
   baseUrl: process.env.APP_BASE_URL,
 
   allScriptsTimeout: Number(process.env.GLOBAL_TIMEOUT),
