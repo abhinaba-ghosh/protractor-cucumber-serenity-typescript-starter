@@ -1,254 +1,150 @@
-import chalk from 'chalk';
-import { browser, ElementFinder, ExpectedConditions } from 'protractor';
+import * as fs from 'fs';
+import * as path from 'path';
+import { browser, Capabilities, ElementFinder } from 'protractor';
 
-import {
-  getDeafultTextTextIsStillPresentOnElementMessage,
-  getDefaultCurrentUrlContainsTheString,
-  getDefaultCurrentUrlDoesNotContainStringMessage,
-  getDefaultCurrentUrlIsDifferentThanExpectedUrlMessage,
-  getDefaultCurrentUrlIsEqualToExpectedUrlMessage,
-  getDefaultIsNotPresentMessage,
-  getDefaultIsStillPresentMessage,
-  getDefaultIsStillVisibleMessage,
-  getDefaultTextTextNotPresentOnElementMessage
-} from '../utils/message.builder';
 import { timeout } from '../utils/validator';
+import { browserWaitElementVisible } from './waiters';
 
 /**
- * this method checks one element contains all the required values. Method returns true if it contains all the required values.
- * @param elementToCheck
- * @param values
+ * this method helps to upload a file from the system to a certain drop element
+ * @param fileName
+ * @param element
  */
-export const doesElementContainAllValues = async (elementToCheck: ElementFinder, ...values: string[]): Promise<boolean> => {
-  return elementToCheck.getText().then(text => {
-    return values.reduce((previous, current) => {
-      return text.includes(current) && previous;
-    }, true);
+export const uploadFile = (fileName: string, htmlElement: ElementFinder): Promise<void | boolean> => {
+  const filePath: string = path.resolve(__dirname, fileName);
+  return new Promise((resolve, reject) => {
+    fs.stat(filePath, rslt => {
+      if (!rslt) {
+        htmlElement.sendKeys(filePath);
+        resolve(true);
+      } else {
+        const message: string = rslt.code === 'ENOENT' ? `File does not exist in path ${fileName}!!!` : `Some other error: ${rslt.code}`;
+        reject(message);
+      }
+    });
   });
 };
 
 /**
- * this method awaits the execution untill an element is clickable
- * @param selectOptionLocator
+ * this method helps to drag and drop a element into another element
+ * @param dragElement
+ * @param dropElement
  */
-export const browserWaitElementClickable = async (selectOptionLocator: ElementFinder, customWait?: number): Promise<boolean> =>
-  browser.wait(
-    ExpectedConditions.elementToBeClickable(selectOptionLocator),
-    Number(customWait || process.env.IMPLICIT_WAIT),
-    `Element is not clickable: ${selectOptionLocator.locator()}`
-  );
-
-/**
- * this method awaits the execution until an element is visible
- * @param selectOptionLocator
- */
-
-/**
- * this method awaits the execution untill an element is visible
- * @param selectOptionLocator
- * @param timeout
- * @param tryCount
- */
-export const browserWaitElementVisible = async (
-  selectOptionLocator: ElementFinder,
-  timeout: number = Number(process.env.IMPLICIT_WAIT) || 10000,
-  tryCount: number = Math.floor(Number(process.env.TEST_RETRY_COUNT) / 2) || 5
-): Promise<boolean> => {
-  return browser
-    .wait(
-      ExpectedConditions.visibilityOf(selectOptionLocator),
-      Number(Math.floor(Number(timeout) / Number(tryCount))),
-      `Element is not visible: ${selectOptionLocator.locator()}`
-    )
-    .then(
-      () => true,
-      error => {
-        tryCount = tryCount - 1;
-        if (tryCount > 0) {
-          console.log(chalk.yellow(`Error Occured: ${error}`));
-          console.log(
-            chalk.yellow(
-              `Re-trying waiting for Element ${selectOptionLocator.parentElementArrayFinder.locator_} to appear, try ${tryCount} times more`
-            )
-          );
-          return browserWaitElementVisible(selectOptionLocator, timeout - Number(Math.floor(Number(timeout) / Number(tryCount + 1))), tryCount);
-        } else {
-          console.error(chalk.redBright(`Error Occured: ${error}`));
-          console.error(chalk.redBright(`Error while clicking on ${selectOptionLocator.locator()}`));
-          throw error + getDefaultIsStillVisibleMessage(selectOptionLocator);
-        }
-      }
-    );
+export const dragAndDrop = async (dragElement: ElementFinder, dropElement: ElementFinder): Promise<void> => {
+  await browser.executeScript(dragAndDrop, dragElement, dropElement);
 };
 
 /**
- * This method helps to wait until an element present in the DOM
- * @param webElement
- * @param timeoutInMilliseconds
+ * This method helps to check whether current url is different from base url
  */
-export const browserWaitElementPresence = async (
-  webElement: ElementFinder,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> => browser.wait(ExpectedConditions.presenceOf(webElement), timeoutInMilliseconds, getDefaultIsNotPresentMessage(webElement));
-
-/**
- * This method helps to wait untill an element not present in the DOM
- * @param webElement
- * @param timeoutInMilliseconds
- */
-export const browserWaitElementNotToBePresent = async (
-  webElement: ElementFinder,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> => browser.wait(ExpectedConditions.stalenessOf(webElement), timeoutInMilliseconds, getDefaultIsStillPresentMessage(webElement));
-
-/**
- * This method helps to wait untill an element not visible in the DOM
- * @param webElement
- * @param timeoutInMilliseconds
- * @tryCount
- */
-export const browserWaitElementNotToBeVisible = async (
-  selectOptionLocator: ElementFinder,
-  timeout: number = Number(process.env.IMPLICIT_WAIT) || 10000,
-  tryCount: number = Math.floor(Number(process.env.TEST_RETRY_COUNT) / 2) || 5
-): Promise<boolean> => {
-  return browser
-    .wait(
-      ExpectedConditions.invisibilityOf(selectOptionLocator),
-      Number(Math.floor(Number(timeout) / Number(tryCount))),
-      `Element is not visible: ${selectOptionLocator.locator()}`
-    )
-    .then(
-      () => true,
-      error => {
-        tryCount = tryCount - 1;
-        if (tryCount > 0) {
-          console.log(chalk.yellow(`Error Occured: ${error}`));
-          console.log(
-            chalk.yellow(
-              `Re-trying waiting for Element ${selectOptionLocator.parentElementArrayFinder.locator_} to disappear, try ${tryCount} times more`
-            )
-          );
-          return browserWaitElementNotToBeVisible(
-            selectOptionLocator,
-            timeout - Number(Math.floor(Number(timeout) / Number(tryCount + 1))),
-            tryCount
-          );
-        } else {
-          console.error(chalk.redBright(`Error Occured: ${error}`));
-          console.error(chalk.redBright(`Error ${selectOptionLocator.locator()} did not disappear`));
-          throw error;
-        }
-      }
-    );
+export const isCurrentUrlDifferentFromBaseUrl = async (): Promise<boolean> => {
+  return browser.getCurrentUrl().then(url => url !== browser.baseUrl);
 };
 
 /**
- * This method helps to wait untill specific text is present in specific element
- * @param webElement
- * @param text
+ * This method helps to scroll to a specific element
+ * @param htmlElement
  * @param timeoutInMilliseconds
  */
-export const browserWaitTextToBePresentInElement = async (
-  webElement: ElementFinder,
-  text: string,
-  timeoutInMilliseconds = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> =>
-  browser.wait(
-    ExpectedConditions.textToBePresentInElement(webElement, text),
-    timeoutInMilliseconds,
-    getDefaultTextTextNotPresentOnElementMessage(webElement, text)
-  );
-
-/**
- * This method helps to wait untill specific text is present in specific element
- * @param webElement
- * @param text
- * @param timeoutInMilliseconds
- */
-export const browserWaitTextToBePresentInElementValue = async (
-  webElement: ElementFinder,
-  text: string,
-  timeoutInMilliseconds = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> =>
-  browser.wait(
-    ExpectedConditions.textToBePresentInElementValue(webElement, text),
-    timeoutInMilliseconds,
-    getDefaultTextTextNotPresentOnElementMessage(webElement, text)
-  );
-
-/**
- * This method helps to wait untill specific text not to be present in specific element
- * @param webElement
- * @param text
- * @param timeoutInMilliseconds
- */
-export const browserWaitTextNotToBePresentInElement = async (
-  webElement: ElementFinder,
-  text: string,
+export const scrollToElement = async (
+  htmlElement: ElementFinder,
   timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> =>
-  browser.wait(
-    ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(webElement, text)),
-    timeoutInMilliseconds,
-    getDeafultTextTextIsStillPresentOnElementMessage(webElement, text)
-  );
+): Promise<void> => {
+  await browserWaitElementVisible(htmlElement, timeoutInMilliseconds);
+  await browser.executeScript('arguments[0].scrollIntoView(true);', htmlElement);
+};
 
 /**
- * This method helps to wait untill browser url to be equal to expected url
- * @param expectedUrl
- * @param timeoutInMilliseconds
+ * this method helps to get the current date and time
  */
-export const browerWaitUrlToBeEqualToExpectedUrl = async (
-  expectedUrl: string,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> =>
-  browser.wait(ExpectedConditions.urlIs(expectedUrl), timeoutInMilliseconds, getDefaultCurrentUrlIsDifferentThanExpectedUrlMessage(expectedUrl));
+export const getCurrentDateTime = (): string => {
+  const today: Date = new Date();
+  const currentDateAndTime: string = `${today.getMonth() + 1}-${today.getDate()}-${today.getHours()}-${today.getMinutes()}-${today.getSeconds()}`;
+  return currentDateAndTime;
+};
 
 /**
- * This method helps to wait untill browser url not to be equal to expected url
- * @param expectedUrl
- * @param timeoutInMilliseconds
+ * this method helps to get all window titles
+ * @param windowTitle
  */
-export const browserWaitUrlNotToBeEqualToExpectedUrl = async (
-  expectedUrl: string,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> =>
-  browser.wait(
-    ExpectedConditions.not(ExpectedConditions.urlIs(expectedUrl)),
-    timeoutInMilliseconds,
-    getDefaultCurrentUrlIsEqualToExpectedUrlMessage(expectedUrl)
-  );
-
-/**
- * This method helps to wait untill url contains specific text
- * @param url
- * @param timeoutInMilliseconds
- */
-export const browserWaitUrlToContainString = async (
-  url: string,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> => browser.wait(ExpectedConditions.urlContains(url), timeoutInMilliseconds, getDefaultCurrentUrlDoesNotContainStringMessage(url));
-
-/**
- * This method helps to wait untill url des not contain the specific text
- * @param url
- * @param timeoutInMilliseconds
- */
-export const browserWaitUrlNotToContainString = async (
-  url: string,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> =>
-  browser.wait(ExpectedConditions.not(ExpectedConditions.urlContains(url)), timeoutInMilliseconds, getDefaultCurrentUrlContainsTheString(url));
-
-/**
- * this method awaits the execution untill an element is displayed.
- * @param selectOptionLocator
- */
-export const isElementDisplayed = async (selectOptionLocator: ElementFinder): Promise<boolean> => {
-  return browser.wait(
-    ExpectedConditions.visibilityOf(selectOptionLocator),
+export const getAllRedirectedBrowserWindowTitles = async (): Promise<string[]> => {
+  const title: string[] = [];
+  await browser.wait(
+    async () => {
+      return (await browser.getAllWindowHandles()).length >= 2;
+    },
     Number(process.env.IMPLICIT_WAIT),
-    `Element is not displayed: ${selectOptionLocator.locator()}`
+    `Only one browser handle found. There is no other browser handle to iterate`
   );
+  const _windowHandles: string[] = await browser.getAllWindowHandles();
+  const _parentHandle: string = _windowHandles[0];
+  for (const guid of _windowHandles) {
+    if (guid !== _parentHandle) {
+      await browser.switchTo().window(guid);
+      await browser.wait(
+        async () => {
+          return (await browser.getTitle()) ? true : false;
+        },
+        Number(process.env.IMPLICIT_WAIT),
+        `Child browser title not loaded`
+      );
+      title.push(await browser.getTitle());
+      await browser.close();
+    }
+  }
+  await browser.switchTo().window(_parentHandle);
+  return title;
+};
+
+/**
+ * this method verify the file is downloaded
+ * @param fileName
+ */
+export const verifyFileDownloaded = async (fileName: string): Promise<boolean> => {
+  console.log('Getting users download path: ' + (await this.downloadsFolder()));
+  const filePath: string = ((await this.downloadsFolder()) + '\\' + fileName).replace(/\\/g, '/');
+  console.log('Getting the path ' + filePath);
+  return browser.wait(async () => fs.existsSync(filePath), Number(process.env.IMPLICIT_WAIT), 'File never appeared!');
+};
+
+/**
+ * This method provides the download directory based on the browser
+ */
+export const downloadsFolder = async (): Promise<string> => {
+  let downloadsPath: string = '';
+  const capabilities: Capabilities = await browser.getCapabilities();
+  const currentBrowser: string = capabilities.get('browserName');
+  if (currentBrowser.includes('chrome')) {
+    downloadsPath = process.cwd() + `\\${process.env.TEST_REPORT_DIRECTORY}\\downloads\\chrome`;
+  }
+  if (currentBrowser.includes('firefox')) {
+    downloadsPath = process.cwd() + `\\${process.env.TEST_REPORT_DIRECTORY}\\downloads\\firefox`;
+  }
+  if (currentBrowser.includes('ie')) {
+    downloadsPath = process.cwd() + `\\${process.env.TEST_REPORT_DIRECTORY}\\downloads\\ie`;
+  }
+
+  return downloadsPath;
+};
+
+/**
+ * This method helps to add content to TinyMce text editor
+ * @param content
+ * @param frameIndex
+ */
+export const addContentToTinyMceEditor = async (content: string, index: number): Promise<void> => {
+  await browser.executeScript(`return tinyMCE.editors[${index}].resetContent();`);
+  await browser.executeScript(
+    `return tinyMCE.editors[${index}].setContent('<html><head><style type="text/css">.c0 { font-family: Arial }</style></head><body class="c0">${content}</body></html>');`
+  );
+  await browser.executeScript(`return tinyMCE.editors[${index}].save();`);
+};
+
+/**
+ * This method helps verify text from TinyMce text editor
+ * @param content
+ * @param frameIndex
+ */
+export const getTinyMceEditorContent = async (index: string): Promise<void> => {
+  return browser.executeScript(`return tinyMCE.editors[${index}].getContent();`);
 };
