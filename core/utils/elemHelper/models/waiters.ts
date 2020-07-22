@@ -10,8 +10,8 @@ import {
   getDefaultIsNotPresentMessage,
   getDefaultIsStillPresentMessage,
   getDefaultIsStillVisibleMessage,
-  getDefaultTextTextNotPresentOnElementMessage
-} from '../utils/message.builder';
+  getDefaultTextTextNotPresentOnElementMessage,
+} from '../utils/message-builder';
 import { timeout } from '../utils/validator';
 
 /**
@@ -19,8 +19,11 @@ import { timeout } from '../utils/validator';
  * @param elementToCheck
  * @param values
  */
-export const doesElementContainAllValues = async (elementToCheck: ElementFinder, ...values: string[]): Promise<boolean> => {
-  return elementToCheck.getText().then(text => {
+export const doesElementContainAllValues = async (
+  elementToCheck: ElementFinder,
+  ...values: string[]
+): Promise<boolean> => {
+  return elementToCheck.getText().then((text) => {
     return values.reduce((previous, current) => {
       return text.includes(current) && previous;
     }, true);
@@ -31,7 +34,10 @@ export const doesElementContainAllValues = async (elementToCheck: ElementFinder,
  * this method awaits the execution untill an element is clickable
  * @param selectOptionLocator
  */
-export const browserWaitElementClickable = async (selectOptionLocator: ElementFinder, customWait?: number): Promise<boolean> =>
+export const browserWaitElementClickable = async (
+  selectOptionLocator: ElementFinder,
+  customWait?: number
+): Promise<boolean> =>
   browser.wait(
     ExpectedConditions.elementToBeClickable(selectOptionLocator),
     Number(customWait || process.env.IMPLICIT_WAIT),
@@ -62,7 +68,7 @@ export const browserWaitElementVisible = async (
     )
     .then(
       () => true,
-      error => {
+      (error) => {
         tryCount = tryCount - 1;
         if (tryCount > 0) {
           console.log(chalk.yellow(`Error Occured: ${error}`));
@@ -71,10 +77,19 @@ export const browserWaitElementVisible = async (
               `Re-trying waiting for Element ${selectOptionLocator.parentElementArrayFinder.locator_} to appear, try ${tryCount} times more`
             )
           );
-          return browserWaitElementVisible(selectOptionLocator, timeout - Number(Math.floor(Number(timeout) / Number(tryCount + 1))), tryCount);
+          return browserWaitElementVisible(
+            selectOptionLocator,
+            timeout -
+              Number(Math.floor(Number(timeout) / Number(tryCount + 1))),
+            tryCount
+          );
         } else {
           console.error(chalk.redBright(`Error Occured: ${error}`));
-          console.error(chalk.redBright(`Error while clicking on ${selectOptionLocator.locator()}`));
+          console.error(
+            chalk.redBright(
+              `Error while clicking on ${selectOptionLocator.locator()}`
+            )
+          );
           throw error + getDefaultIsStillVisibleMessage(selectOptionLocator);
         }
       }
@@ -88,8 +103,14 @@ export const browserWaitElementVisible = async (
  */
 export const browserWaitElementPresence = async (
   webElement: ElementFinder,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> => browser.wait(ExpectedConditions.presenceOf(webElement), timeoutInMilliseconds, getDefaultIsNotPresentMessage(webElement));
+  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) ||
+    timeout.timeoutInMilliseconds
+): Promise<boolean> =>
+  browser.wait(
+    ExpectedConditions.presenceOf(webElement),
+    timeoutInMilliseconds,
+    getDefaultIsNotPresentMessage(webElement)
+  );
 
 /**
  * This method helps to wait untill an element not present in the DOM
@@ -98,8 +119,14 @@ export const browserWaitElementPresence = async (
  */
 export const browserWaitElementNotToBePresent = async (
   webElement: ElementFinder,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> => browser.wait(ExpectedConditions.stalenessOf(webElement), timeoutInMilliseconds, getDefaultIsStillPresentMessage(webElement));
+  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) ||
+    timeout.timeoutInMilliseconds
+): Promise<boolean> =>
+  browser.wait(
+    ExpectedConditions.stalenessOf(webElement),
+    timeoutInMilliseconds,
+    getDefaultIsStillPresentMessage(webElement)
+  );
 
 /**
  * This method helps to wait untill an element not visible in the DOM
@@ -120,7 +147,7 @@ export const browserWaitElementNotToBeVisible = async (
     )
     .then(
       () => true,
-      error => {
+      (error) => {
         tryCount = tryCount - 1;
         if (tryCount > 0) {
           console.log(chalk.yellow(`Error Occured: ${error}`));
@@ -131,12 +158,17 @@ export const browserWaitElementNotToBeVisible = async (
           );
           return browserWaitElementNotToBeVisible(
             selectOptionLocator,
-            timeout - Number(Math.floor(Number(timeout) / Number(tryCount + 1))),
+            timeout -
+              Number(Math.floor(Number(timeout) / Number(tryCount + 1))),
             tryCount
           );
         } else {
           console.error(chalk.redBright(`Error Occured: ${error}`));
-          console.error(chalk.redBright(`Error ${selectOptionLocator.locator()} did not disappear`));
+          console.error(
+            chalk.redBright(
+              `Error ${selectOptionLocator.locator()} did not disappear`
+            )
+          );
           throw error;
         }
       }
@@ -152,7 +184,8 @@ export const browserWaitElementNotToBeVisible = async (
 export const browserWaitTextToBePresentInElement = async (
   webElement: ElementFinder,
   text: string,
-  timeoutInMilliseconds = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
+  timeoutInMilliseconds = Number(process.env.IMPLICIT_WAIT) ||
+    timeout.timeoutInMilliseconds
 ): Promise<boolean> =>
   browser.wait(
     ExpectedConditions.textToBePresentInElement(webElement, text),
@@ -169,7 +202,8 @@ export const browserWaitTextToBePresentInElement = async (
 export const browserWaitTextToBePresentInElementValue = async (
   webElement: ElementFinder,
   text: string,
-  timeoutInMilliseconds = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
+  timeoutInMilliseconds = Number(process.env.IMPLICIT_WAIT) ||
+    timeout.timeoutInMilliseconds
 ): Promise<boolean> =>
   browser.wait(
     ExpectedConditions.textToBePresentInElementValue(webElement, text),
@@ -186,10 +220,13 @@ export const browserWaitTextToBePresentInElementValue = async (
 export const browserWaitTextNotToBePresentInElement = async (
   webElement: ElementFinder,
   text: string,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
+  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) ||
+    timeout.timeoutInMilliseconds
 ): Promise<boolean> =>
   browser.wait(
-    ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(webElement, text)),
+    ExpectedConditions.not(
+      ExpectedConditions.textToBePresentInElement(webElement, text)
+    ),
     timeoutInMilliseconds,
     getDeafultTextTextIsStillPresentOnElementMessage(webElement, text)
   );
@@ -201,9 +238,14 @@ export const browserWaitTextNotToBePresentInElement = async (
  */
 export const browerWaitUrlToBeEqualToExpectedUrl = async (
   expectedUrl: string,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
+  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) ||
+    timeout.timeoutInMilliseconds
 ): Promise<boolean> =>
-  browser.wait(ExpectedConditions.urlIs(expectedUrl), timeoutInMilliseconds, getDefaultCurrentUrlIsDifferentThanExpectedUrlMessage(expectedUrl));
+  browser.wait(
+    ExpectedConditions.urlIs(expectedUrl),
+    timeoutInMilliseconds,
+    getDefaultCurrentUrlIsDifferentThanExpectedUrlMessage(expectedUrl)
+  );
 
 /**
  * This method helps to wait untill browser url not to be equal to expected url
@@ -212,7 +254,8 @@ export const browerWaitUrlToBeEqualToExpectedUrl = async (
  */
 export const browserWaitUrlNotToBeEqualToExpectedUrl = async (
   expectedUrl: string,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
+  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) ||
+    timeout.timeoutInMilliseconds
 ): Promise<boolean> =>
   browser.wait(
     ExpectedConditions.not(ExpectedConditions.urlIs(expectedUrl)),
@@ -227,8 +270,14 @@ export const browserWaitUrlNotToBeEqualToExpectedUrl = async (
  */
 export const browserWaitUrlToContainString = async (
   url: string,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
-): Promise<boolean> => browser.wait(ExpectedConditions.urlContains(url), timeoutInMilliseconds, getDefaultCurrentUrlDoesNotContainStringMessage(url));
+  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) ||
+    timeout.timeoutInMilliseconds
+): Promise<boolean> =>
+  browser.wait(
+    ExpectedConditions.urlContains(url),
+    timeoutInMilliseconds,
+    getDefaultCurrentUrlDoesNotContainStringMessage(url)
+  );
 
 /**
  * This method helps to wait untill url des not contain the specific text
@@ -237,15 +286,22 @@ export const browserWaitUrlToContainString = async (
  */
 export const browserWaitUrlNotToContainString = async (
   url: string,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
+  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) ||
+    timeout.timeoutInMilliseconds
 ): Promise<boolean> =>
-  browser.wait(ExpectedConditions.not(ExpectedConditions.urlContains(url)), timeoutInMilliseconds, getDefaultCurrentUrlContainsTheString(url));
+  browser.wait(
+    ExpectedConditions.not(ExpectedConditions.urlContains(url)),
+    timeoutInMilliseconds,
+    getDefaultCurrentUrlContainsTheString(url)
+  );
 
 /**
  * this method awaits the execution untill an element is displayed.
  * @param selectOptionLocator
  */
-export const isElementDisplayed = async (selectOptionLocator: ElementFinder): Promise<boolean> => {
+export const isElementDisplayed = async (
+  selectOptionLocator: ElementFinder
+): Promise<boolean> => {
   return browser.wait(
     ExpectedConditions.visibilityOf(selectOptionLocator),
     Number(process.env.IMPLICIT_WAIT),

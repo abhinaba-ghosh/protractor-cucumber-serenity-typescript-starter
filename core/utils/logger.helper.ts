@@ -16,9 +16,9 @@ configure({
     console: { type: 'console' },
     file: {
       type: 'file',
-      filename: `${process.cwd()}/target/logs/test_${new Date()
-        .toISOString()
-        .replace(/\W/g, '')}.log`,
+      filename: `${
+        process.env.TEST_REPORT_DIRECTORY
+      }/logs/test_${new Date().toISOString().replace(/\W/g, '')}.log`,
     },
   },
   categories: {

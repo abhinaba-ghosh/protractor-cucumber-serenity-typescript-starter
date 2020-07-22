@@ -41,14 +41,19 @@ const config: Config = {
     runner: 'cucumber',
     requirementsDirectory: `${process.cwd()}/e2e/features`,
     crew: [
-      ArtifactArchiver.storingArtifactsAt('./target/site/serenity'),
+      ArtifactArchiver.storingArtifactsAt(
+        process.env.SERENITY_REPORT_DIRECTORY
+      ),
       new SerenityBDDReporter(),
       ConsoleReporter.withDefaultColourSupport(),
       Photographer.whoWill(TakePhotosOfInteractions),
     ],
   },
   cucumberOpts: {
-    format: ['pretty', 'json:target/cucumber_report.json'],
+    format: [
+      'pretty',
+      `json:${process.env.TEST_REPORT_DIRECTORY}/cucumber_report.json`,
+    ],
     require: [`${process.cwd()}/e2e/**/*.ts`, `${process.cwd()}/core/**/*.ts`],
     'require-module': ['ts-node/register'],
     tags: ['~@manual', '~@ignore'],
@@ -71,7 +76,7 @@ const config: Config = {
         'best-practice',
       ], // A list of standards to report on. If empty, reports on all standards.
       ignoreAxeFailures: false, // If true, aXe failures won't cause the whole test to fail. Defaults to false
-      htmlReportPath: 'target/accessibility',
+      htmlReportPath: `${process.env.TEST_REPORT_DIRECTORY}/accessibility`,
     },
 
     {

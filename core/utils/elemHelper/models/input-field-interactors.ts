@@ -21,23 +21,39 @@ import { browserWaitElementVisible } from './waiters';
 export const typeValue = (
   htmlElement: ElementFinder,
   value: string,
-  timeout: number = Math.floor(Number(process.env.IMPLICIT_WAIT) / Number(process.env.TEST_RETRY_COUNT)) || 5000,
+  timeout: number = Math.floor(
+    Number(process.env.IMPLICIT_WAIT) / Number(process.env.TEST_RETRY_COUNT)
+  ) || 5000,
   tryCount: number = Number(process.env.TEST_RETRY_COUNT) || 10
 ): webdriver.promise.Promise<void> => {
-  return browser.wait(protractor.ExpectedConditions.presenceOf(htmlElement), timeout, `Element ${htmlElement.locator()} is not present`).then(
-    () => {
-      htmlElement.sendKeys(value);
-    },
-    (error: any) => {
-      if (tryCount > 0) {
-        console.log(chalk.yellow(`Send keys retry ${tryCount} on target ${htmlElement.locator()}`));
-        typeValue(htmlElement, value, timeout, tryCount - 1);
-      } else {
-        console.error(chalk.redBright(`Error while sending keys on ${htmlElement.locator()}`));
-        throw error;
+  return browser
+    .wait(
+      protractor.ExpectedConditions.presenceOf(htmlElement),
+      timeout,
+      `Element ${htmlElement.locator()} is not present`
+    )
+    .then(
+      () => {
+        htmlElement.sendKeys(value);
+      },
+      (error: any) => {
+        if (tryCount > 0) {
+          console.log(
+            chalk.yellow(
+              `Send keys retry ${tryCount} on target ${htmlElement.locator()}`
+            )
+          );
+          typeValue(htmlElement, value, timeout, tryCount - 1);
+        } else {
+          console.error(
+            chalk.redBright(
+              `Error while sending keys on ${htmlElement.locator()}`
+            )
+          );
+          throw error;
+        }
       }
-    }
-  );
+    );
 };
 
 /**
@@ -45,7 +61,10 @@ export const typeValue = (
  * @param dateInput
  * @param date
  */
-export const typeDate = async (dateInput: ElementFinder, date: string): Promise<void> => {
+export const typeDate = async (
+  dateInput: ElementFinder,
+  date: string
+): Promise<void> => {
   await dateInput.click();
   await dateInput.clear();
   return dateInput.sendKeys(date);
@@ -58,7 +77,8 @@ export const typeDate = async (dateInput: ElementFinder, date: string): Promise<
  */
 export const clear = async (
   webElement: ElementFinder,
-  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) || timeout.timeoutInMilliseconds
+  timeoutInMilliseconds: number = Number(process.env.IMPLICIT_WAIT) ||
+    timeout.timeoutInMilliseconds
 ): Promise<void> => {
   await browserWaitElementVisible(webElement, timeoutInMilliseconds);
   await webElement.clear();
@@ -74,11 +94,17 @@ export const clear = async (
 export const getAttribute = (
   htmlElement: ElementFinder,
   attributeName: string,
-  timeout: number = Math.floor(Number(process.env.IMPLICIT_WAIT) / Number(process.env.TEST_RETRY_COUNT)) || 5000,
+  timeout: number = Math.floor(
+    Number(process.env.IMPLICIT_WAIT) / Number(process.env.TEST_RETRY_COUNT)
+  ) || 5000,
   tryCount: number = Number(process.env.TEST_RETRY_COUNT) || 10
 ): webdriver.promise.Promise<string> => {
   return browser
-    .wait(protractor.ExpectedConditions.presenceOf(htmlElement), timeout, `Element ${htmlElement.locator()} is not present`)
+    .wait(
+      protractor.ExpectedConditions.presenceOf(htmlElement),
+      timeout,
+      `Element ${htmlElement.locator()} is not present`
+    )
     .then(() => {
       return htmlElement.getAttribute(attributeName);
     })
@@ -86,10 +112,18 @@ export const getAttribute = (
       (value: string) => value,
       (error: any) => {
         if (tryCount === 0) {
-          console.error(chalk.redBright(`Error while getting attribute value on ${htmlElement.locator()}`));
+          console.error(
+            chalk.redBright(
+              `Error while getting attribute value on ${htmlElement.locator()}`
+            )
+          );
           throw error;
         }
-        console.log(chalk.yellow(`getAttribute retry ${tryCount} on target ${htmlElement.locator()}`));
+        console.log(
+          chalk.yellow(
+            `getAttribute retry ${tryCount} on target ${htmlElement.locator()}`
+          )
+        );
         return getAttribute(htmlElement, attributeName, timeout, tryCount - 1);
       }
     );
@@ -105,11 +139,17 @@ export const getAttribute = (
 export const getCssValue = (
   htmlElement: ElementFinder,
   cssValue: string,
-  timeout: number = Math.floor(Number(process.env.IMPLICIT_WAIT) / Number(process.env.TEST_RETRY_COUNT)) || 5000,
+  timeout: number = Math.floor(
+    Number(process.env.IMPLICIT_WAIT) / Number(process.env.TEST_RETRY_COUNT)
+  ) || 5000,
   tryCount: number = Number(process.env.TEST_RETRY_COUNT) || 10
 ): webdriver.promise.Promise<string> => {
   return browser
-    .wait(protractor.ExpectedConditions.presenceOf(htmlElement), timeout, `Element ${htmlElement.locator()} is not present`)
+    .wait(
+      protractor.ExpectedConditions.presenceOf(htmlElement),
+      timeout,
+      `Element ${htmlElement.locator()} is not present`
+    )
     .then(() => {
       return htmlElement.getCssValue(cssValue);
     })
@@ -117,10 +157,18 @@ export const getCssValue = (
       (value: string) => value,
       (error: any) => {
         if (tryCount === 0) {
-          console.error(chalk.redBright(`Error while getting css value on target ${htmlElement.locator()}`));
+          console.error(
+            chalk.redBright(
+              `Error while getting css value on target ${htmlElement.locator()}`
+            )
+          );
           throw error;
         }
-        console.log(chalk.yellow(`getCssValue retry ${tryCount} on target ${htmlElement.locator()}v`));
+        console.log(
+          chalk.yellow(
+            `getCssValue retry ${tryCount} on target ${htmlElement.locator()}v`
+          )
+        );
         return getCssValue(htmlElement, cssValue, timeout, tryCount - 1);
       }
     );
@@ -134,11 +182,17 @@ export const getCssValue = (
  */
 export const getText = (
   htmlElement: ElementFinder,
-  timeout: number = Math.floor(Number(process.env.IMPLICIT_WAIT) / Number(process.env.TEST_RETRY_COUNT)) || 5000,
+  timeout: number = Math.floor(
+    Number(process.env.IMPLICIT_WAIT) / Number(process.env.TEST_RETRY_COUNT)
+  ) || 5000,
   tryCount: number = Number(process.env.TEST_RETRY_COUNT) || 10
 ): webdriver.promise.Promise<string> => {
   return browser
-    .wait(protractor.ExpectedConditions.presenceOf(htmlElement), timeout, `Element ${htmlElement.locator()} is not present`)
+    .wait(
+      protractor.ExpectedConditions.presenceOf(htmlElement),
+      timeout,
+      `Element ${htmlElement.locator()} is not present`
+    )
     .then(() => {
       return htmlElement.getText();
     })
@@ -146,10 +200,16 @@ export const getText = (
       (value: string) => value,
       (error: any) => {
         if (tryCount === 0) {
-          console.error(chalk.redBright(`Error while getting text on ${htmlElement.locator()}`));
+          console.error(
+            chalk.redBright(
+              `Error while getting text on ${htmlElement.locator()}`
+            )
+          );
           throw error;
         }
-        console.log(chalk.yellow(`getText retry ${tryCount} on ${htmlElement.locator()}`));
+        console.log(
+          chalk.yellow(`getText retry ${tryCount} on ${htmlElement.locator()}`)
+        );
         return getText(htmlElement, timeout, tryCount - 1);
       }
     );
